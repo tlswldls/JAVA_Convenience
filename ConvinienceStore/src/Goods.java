@@ -65,7 +65,7 @@ public class Goods {
 	}
 	
 	void removeStock(int count) throws Exception{	//재고를 빼는 메소드
-		if(stock<=count) {	//재고의 개수가 0이하이면
+		if(stock<count) {	//재고의 개수가 0이하이면
 			throw new Exception("재고 부족");	//익셉션 던지기
 		}else {	//재고의 개수가 0 이상이면 
 			stock = stock - count;

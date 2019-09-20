@@ -1,18 +1,17 @@
-import java.util.Scanner;
 import java.io.*;
+import java.util.*;
+
 public class UserInterface {
 	public static void main(String []args) throws Exception {
-		Management manager = new Management();
 		
+		Management manager = new Management();
 		try {
 			//fIn에 information.txt파일 저장
 			FileInputStream fIn = new FileInputStream("information.txt");
 			//in에 fIn저장
 			DataInputStream in = new DataInputStream(fIn);
-			
-			//저장되어있는 데이터를 불러와 프로그램을 설정
-			manager.readFile(in);
-			in.close();
+			manager = new Management(in);
+
 		}
 		catch(FileNotFoundException e) {	//파일이 존재하지 않는 경우
 			System.out.println("존재하지 않는 파일입니다.");
@@ -78,8 +77,8 @@ public class UserInterface {
 							if(answer<=0) {	//사용자가 입력한 값(구매하고자 하는 물건의 개수)이 0이하이면
 								System.out.println("1 이상의 숫자만 입력하세요.");
 								continue;	//다음 반복 실행
-							}else if(answer>manager.getGoodsList()[manager.findGoodsIndex(answerStr)].getstock()) {	//사용자가 입력한 값(구매하고자 하는 물건의 개수)이 해당 물품의 재고보다 크다면
-								System.out.println("재고가 모자랍니다." +manager.getGoodsList()[manager.findGoodsIndex(answerStr)].getstock()+"이하의 숫자를 입력해주세요.");
+							}else if(answer>manager.getGoodsList().get(manager.findGoodsIndex(answerStr)).getstock()) {	//사용자가 입력한 값(구매하고자 하는 물건의 개수)이 해당 물품의 재고보다 크다면
+								System.out.println("재고가 모자랍니다." +manager.getGoodsList().get(manager.findGoodsIndex(answerStr)).getstock()+"이하의 숫자를 입력해주세요.");
 								continue;	//다음 반복 실행
 							}
 							break;	//제대로 입력된 경우 반복 종료
@@ -177,15 +176,15 @@ public class UserInterface {
 					manager.insertGoods(goods);	//goods를 goodsList에 추가
 				}else if(answer == 2) {//2. 상품 목록 조회.
 					System.out.println("상품 목록 조회");
-					Goods[] goodsList = manager.getGoodsList();
-					for(int i=0; i<manager.getcount(); i++) {
-						if(manager.getGoodsList()[i]!=null) {	//배열이 비어있지 않으면 해당 물품의 데이터를 출력
+					LinkedList<Goods> goodsList = manager.getGoodsList();
+					for(int i=0; i<manager.getGoodsList().size(); i++) {
+						if(manager.getGoodsList().get(i)!=null) {	//배열이 비어있지 않으면 해당 물품의 데이터를 출력
 							System.out.println(i+1);
-							System.out.println("상품명 : " + goodsList[i].getname());
-							System.out.println("상품 번호 : " + goodsList[i].getitemNumber());
-							System.out.println("카테고리 : " + goodsList[i].getcategory());
-							System.out.println("가격 : " + goodsList[i].getprice());
-							System.out.println("재고 : " + goodsList[i].getstock());
+							System.out.println("상품명 : " + goodsList.get(i).getname());
+							System.out.println("상품 번호 : " + goodsList.get(i).getitemNumber());
+							System.out.println("카테고리 : " + goodsList.get(i).getcategory());
+							System.out.println("가격 : " + goodsList.get(i).getprice());
+							System.out.println("재고 : " + goodsList.get(i).getstock());
 						}
 					}
 				}else if(answer == 3) {//3. 상품 삭제. 
