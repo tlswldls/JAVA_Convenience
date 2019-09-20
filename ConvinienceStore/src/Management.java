@@ -19,8 +19,12 @@ public class Management {
 		}
 	}
 	
-	LinkedList<Goods> getGoodsList() {//goodsList를 반환하는 메소드
-		return goodsList;
+	Goods[] getGoodsList() {//goodsList를 반환하는 메소드
+		Goods[] goods = new Goods[goodsList.size()];
+		for(int i = 0; i<goodsList.size(); i++) {
+			goods[i] = goodsList.get(i);
+		}
+		return goods;
 	}
 
 	void insertGoods(Goods item) {//goodsList에 새로운 물건을 추가하는 메소드
@@ -31,6 +35,10 @@ public class Management {
 	
 	int getcount() {	//insertGoods함수가 실행된 횟수를 반환해주는 메소드
 		return count;
+	}
+	
+	int getNum() {
+		return num;
 	}
 	
 	int getTotalSales() {	//총 매출액을 반환해주는 메소드

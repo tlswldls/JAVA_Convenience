@@ -77,8 +77,8 @@ public class UserInterface {
 							if(answer<=0) {	//사용자가 입력한 값(구매하고자 하는 물건의 개수)이 0이하이면
 								System.out.println("1 이상의 숫자만 입력하세요.");
 								continue;	//다음 반복 실행
-							}else if(answer>manager.getGoodsList().get(manager.findGoodsIndex(answerStr)).getstock()) {	//사용자가 입력한 값(구매하고자 하는 물건의 개수)이 해당 물품의 재고보다 크다면
-								System.out.println("재고가 모자랍니다." +manager.getGoodsList().get(manager.findGoodsIndex(answerStr)).getstock()+"이하의 숫자를 입력해주세요.");
+							}else if(answer>manager.getGoodsList()[manager.findGoodsIndex(answerStr)].getstock()) {	//사용자가 입력한 값(구매하고자 하는 물건의 개수)이 해당 물품의 재고보다 크다면
+								System.out.println("재고가 모자랍니다." +manager.getGoodsList()[manager.findGoodsIndex(answerStr)].getstock()+"이하의 숫자를 입력해주세요.");
 								continue;	//다음 반복 실행
 							}
 							break;	//제대로 입력된 경우 반복 종료
@@ -176,15 +176,15 @@ public class UserInterface {
 					manager.insertGoods(goods);	//goods를 goodsList에 추가
 				}else if(answer == 2) {//2. 상품 목록 조회.
 					System.out.println("상품 목록 조회");
-					LinkedList<Goods> goodsList = manager.getGoodsList();
-					for(int i=0; i<manager.getGoodsList().size(); i++) {
-						if(manager.getGoodsList().get(i)!=null) {	//배열이 비어있지 않으면 해당 물품의 데이터를 출력
+					Goods[] goodsList = manager.getGoodsList();
+					for(int i=0; i<manager.getNum(); i++) {
+						if(manager.getGoodsList()[i]!=null) {	//배열이 비어있지 않으면 해당 물품의 데이터를 출력
 							System.out.println(i+1);
-							System.out.println("상품명 : " + goodsList.get(i).getname());
-							System.out.println("상품 번호 : " + goodsList.get(i).getitemNumber());
-							System.out.println("카테고리 : " + goodsList.get(i).getcategory());
-							System.out.println("가격 : " + goodsList.get(i).getprice());
-							System.out.println("재고 : " + goodsList.get(i).getstock());
+							System.out.println("상품명 : " + goodsList[i].getname());
+							System.out.println("상품 번호 : " + goodsList[i].getitemNumber());
+							System.out.println("카테고리 : " + goodsList[i].getcategory());
+							System.out.println("가격 : " + goodsList[i].getprice());
+							System.out.println("재고 : " + goodsList[i].getstock());
 						}
 					}
 				}else if(answer == 3) {//3. 상품 삭제. 
@@ -197,6 +197,7 @@ public class UserInterface {
 							categoryItems = manager.findGoods(answerStr);
 						}catch(Exception e){	//입력받은 이름과 일치하는 카테고리를 갖는 상품이 없는 경우
 							System.out.println("존재하지 않는 카테고리입니다. 다시 입력하세요.");
+							continue;
 						}
 						for(int i=0; i<=categoryItems.length-1; i++) {
 							if(categoryItems[i]!=null) {	//배열이 비어있지 않으면 해당 물품의 데이터 출력 같은 카테고리의 아이템이기 때문에 카테고리 정보는 생략했다.
