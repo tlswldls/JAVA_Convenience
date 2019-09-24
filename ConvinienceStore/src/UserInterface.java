@@ -2,14 +2,14 @@ import java.io.*;
 import java.util.*;
 
 public class UserInterface {
-	public static void main(String []args) throws Exception {
-		
-		Management manager = new Management();
+	public static void main(String []args) {
+		Management manager = null;
 		try {
 			//fIn에 information.txt파일 저장
 			FileInputStream fIn = new FileInputStream("information.txt");
 			//in에 fIn저장
 			DataInputStream in = new DataInputStream(fIn);
+			//manager에 in을 읽어온 새로운 객체 할당
 			manager = new Management(in);
 
 		}
@@ -93,6 +93,7 @@ public class UserInterface {
 							}
 							answerChar = input.next().charAt(0);
 							if(answerChar=='y') {	//사용자가 구매하겠다고 한 경우
+								try {
 								if(manager.sellEstimate(manager.findGoodsIndex(answerStr), answer)!=-1) {	//총 금액이 제대로 반환되면
 									manager.sell(manager.findGoodsIndex(answerStr), answer);	//구매 메소드 실행
 									System.out.println("구매가 완료되었습니다.");	//구매가 완료되었습니다 출력
@@ -101,6 +102,10 @@ public class UserInterface {
 									System.out.print("잘못된 값이 입력되었습니다. 다시 시도해주세요.");
 									break;
 								}
+								}catch(Exception e) {
+									
+								}
+								
 							}else if(answerChar=='n') {	//사용자가 구매하지 않겠다고 한 경우
 								break;	//반복 종료
 							}else {	//잘못 입력한 경우
