@@ -94,14 +94,14 @@ public class UserInterface {
 							answerChar = input.next().charAt(0);
 							if(answerChar=='y') {	//사용자가 구매하겠다고 한 경우
 								try {
-								if(manager.sellEstimate(manager.findGoodsIndex(answerStr), answer)!=-1) {	//총 금액이 제대로 반환되면
-									manager.sell(manager.findGoodsIndex(answerStr), answer);	//구매 메소드 실행
-									System.out.println("구매가 완료되었습니다.");	//구매가 완료되었습니다 출력
-									break;	//반복 종료
-								}else {	//제대로 반환되지 않은 경우
+									if(manager.sellEstimate(manager.findGoodsIndex(answerStr), answer)!=-1) {	//총 금액이 제대로 반환되면
+										manager.sell(manager.findGoodsIndex(answerStr), answer);	//구매 메소드 실행
+										System.out.println("구매가 완료되었습니다.");	//구매가 완료되었습니다 출력
+										break;	//반복 종료
+									}else {	//제대로 반환되지 않은 경우
 									System.out.print("잘못된 값이 입력되었습니다. 다시 시도해주세요.");
 									break;
-								}
+									}
 								}catch(Exception e) {
 									
 								}
