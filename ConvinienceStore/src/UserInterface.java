@@ -181,9 +181,14 @@ public class UserInterface {
 					manager.insertGoods(goods);	//goods를 goodsList에 추가
 				}else if(answer == 2) {//2. 상품 목록 조회.
 					System.out.println("상품 목록 조회");
-					Goods[] goodsList = manager.getGoodsList();
-					for(int i=0; i<manager.getNum(); i++) {
-						if(manager.getGoodsList()[i]!=null) {	//배열이 비어있지 않으면 해당 물품의 데이터를 출력
+					Goods[] goodsList = null;	//출력할 매니저 객체의 배열을 가져와 저장할 배열 goodsList 생성
+					try {
+						goodsList = manager.getGoodsList();	//매니저 객체에서 가져온 배열을 goodsList에 저장한다
+					}catch(NullPointerException e) {	//매니저 객체가 가지고 있는 배열이 비어있으면
+						System.out.print("상품 목록이 비어있습니다.");	//안내 메시지 출력
+					}
+					if(goodsList!=null) {
+						for(int i=0; i<manager.getNum(); i++){	//배열이 비어있지 않으면 해당 물품의 데이터를 출력
 							System.out.println(i+1);
 							System.out.println("상품명 : " + goodsList[i].getname());
 							System.out.println("상품 번호 : " + goodsList[i].getitemNumber());

@@ -29,8 +29,8 @@ public class Management {
 	}
 
 	void insertGoods(Goods item) {//goodsList에 새로운 물건을 추가하는 메소드
-				goodsList.add(item);//goodList에 item을 할당하고
-				count++;	//count에 1을 더한다.
+		goodsList.add(item);//goodList에 item을 할당하고
+		count++;	//count에 1을 더한다.
 	}
 	
 	int getcount() {	//insertGoods함수가 실행된 횟수를 반환해주는 메소드
@@ -69,15 +69,6 @@ public class Management {
 			throw new Exception("물품 없음");
 		}
 		
-		/*
-		if(!iterator.hasNext()) {	//goodsList에 들어있는 원소의 개수가 0보다 작거나 같으면
-			throw new Exception("물품 없음");	//물품 없음 익셉션 던지기
-		}else {
-			goodsList.remove(index);	//인덱스 값에 있는 객체를 goodsList에서 삭제
-			//num--;	//num에서 1 감소
-		}
-		goodsList.get 쓰는데는 다 이걸로 바꿔주세요
-		*/
 	}
 	
 	Goods[] findGoods(String category) throws Exception {//카테고리 이름을 입력받고 그 카테고리에 해당하는 객체 배열을 반환하는 메소드
@@ -105,26 +96,33 @@ public class Management {
 	 * 
 	 * */
 	
-	int sellEstimate(int index, int sellCount)throws Exception {	//구매자가 원하는 물품의 값을 알려주는 메소드
-		if(sellCount<=0 || goodsList.get(index).getstock()<sellCount) {	//입력받은 sellCount값이 음수거나 해당 물품의 재고보다 값이 큰 경우
+	int sellEstimate(int index, int sellCount)throws Exception {	//구매자가 원하는 물품의 총 값을 알려주는 메소드
+		try{if(sellCount<=0 || goodsList.get(index).getstock()<sellCount) {	//입력받은 sellCount값이 음수거나 해당 물품의 재고보다 값이 큰 경우
 			throw new Exception("재고 부족");
 		}
 		else return (goodsList.get(index).getprice()*sellCount);	//물품의 가격*구매하고자 하는 물품의 개수를 계산한 값(총 금액)을 리턴
+		}catch(IndexOutOfBoundsException e) {
+			throw new Exception("인덱스 에러");
+		}
 	}
 	
-	int sell(int index, int sellCount) {	//구매자가 구매를 원하면 실제 구매를 실행하는 메소드
+	int sell(int index, int sellCount) throws Exception {	//구매자가 구매를 원하면 실제 구매를 실행하는 메소드
 		int totalPrice = 0;	//총 금액을 나타내는 변수 totalPrice
-		if(sellCount<=0  || goodsList.get(index).getstock()<sellCount) {	//sellCount가 0이하이거나 해당 물품의 재고보다 큰 경우
-			return -1;	//-1반환
-		}else {
-			totalPrice = goodsList.get(index).getprice()*sellCount;	//totlaPrice에 해당 물품의 가격*구매하고자 하는 개수를 계산한 값을 할당
-			try {
-				goodsList.get(index).removeStock(sellCount);	//해당 물품의 재고의 개수에서 sellCount만큼 빼 재고의 개수를 다시 할당해줌
-			} catch (Exception e) {
-				System.out.println("재고의 개수가 부족합니다.");
+		try {
+			if(sellCount<=0  || goodsList.get(index).getstock()<sellCount) {	//sellCount가 0이하이거나 해당 물품의 재고보다 큰 경우
+				return -1;	//-1반환
+			}else {
+				totalPrice = goodsList.get(index).getprice()*sellCount;	//totlaPrice에 해당 물품의 가격*구매하고자 하는 개수를 계산한 값을 할당
+				try {
+					goodsList.get(index).removeStock(sellCount);	//해당 물품의 재고의 개수에서 sellCount만큼 빼 재고의 개수를 다시 할당해줌
+				} catch (Exception e) {
+					System.out.println("재고의 개수가 부족합니다.");
+				}
+				totalSales += totalPrice;	//총매출에 총 가격을 더한다.
+				return totalPrice;	//총 가격을 리턴
 			}
-			totalSales += totalPrice;	//총매출에 총 가격을 더한다.
-			return totalPrice;	//총 가격을 리턴
+		}catch(IndexOutOfBoundsException e) {
+			throw new Exception("인덱스 에러");
 		}
 	}
 	
