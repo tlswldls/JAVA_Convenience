@@ -2,11 +2,11 @@ import java.io.*;
 import java.util.*;
 public class Management {
 	private LinkedList<Goods> goodsList = new LinkedList<Goods>();	//물품 객체를 저장하는 LinkedList goodsList
-	private int count = 0;	//insertGoods함수가 호출된 횟수를 나타내는 데이터필드. 객체의 상품번호를 나타낸다
+	private int count = 1;	//insertGoods함수가 호출된 횟수를 나타내는 데이터필드. 객체의 상품번호를 나타낸다
 	private int totalSales = 0;
 	
 	
-	Management(DataInputStream in)throws Exception{
+	Management(ObjectInputStream in)throws Exception{
 			//저장된 파일이 있다면 자동으로 읽어오는 생성자
 		try {
 			readFile(in);
@@ -14,6 +14,10 @@ public class Management {
 		}catch(Exception e) {//익셉션이 발생한 경우
 			throw new Exception("읽어오기 에러");
 		}
+	}
+	
+	Management(){
+		
 	}
 	
 	Goods[] getGoodsList() {//배열 형태의 goodsList를 반환하는 메소드
@@ -61,8 +65,6 @@ public class Management {
 	}
 	
 	void deleteGoods(int index) throws Exception {	//인덱스를 입력받고 그 인덱스의 값을 삭제하는 메소드
-		Iterator<Goods> iterator = goodsList.iterator();
-		
 		try {
 			goodsList.remove(index);
 		}catch(Exception e) {
@@ -89,12 +91,6 @@ public class Management {
 			return categoryList;	//카테고리 리스트 반환
 		}
 	}
-
-	/*
-	 * 
-	 * get 쓰지 마세요
-	 * 
-	 * */
 	
 	int sellEstimate(int index, int sellCount)throws Exception {	//구매자가 원하는 물품의 총 값을 알려주는 메소드
 		try{if(sellCount<=0 || goodsList.get(index).getstock()<sellCount) {	//입력받은 sellCount값이 음수거나 해당 물품의 재고보다 값이 큰 경우
@@ -126,7 +122,8 @@ public class Management {
 		}
 	}
 	
-	void saveFile(DataOutputStream out) throws Exception{	//데이터를 txt파일로 출력하는 메소드
+	void saveFile(ObjectOutputStream out) throws Exception{	//데이터를 txt파일로 출력하는 메소드
+		//object output stream으로 바꾸세요
 		try{
 			Iterator<Goods> iterator = goodsList.iterator();
 			out.writeInt(totalSales);	//누적 총 매출값 출력
@@ -136,24 +133,35 @@ public class Management {
 			while(iterator.hasNext()) {	//객체가 가지고 있는 데이터 출력
 				iterator.next().save(out);
 			}
-		}catch(Exception e) {	//출력이 제대로 이루어지지 않은 경우 익셉션 던지기
+		}catch(IOException e) {	//출력이 제대로 이루어지지 않은 경우 익셉션 던지기
 			throw new Exception("출력 오류");
+		}finally {
+			try {
+				out.close();
+			}catch(Exception e) {
+			}
 		}
 	}
 
-	void readFile(DataInputStream in) throws Exception{	//txt파일에서 데이터를 읽어오는 메소드
+	void readFile(ObjectInputStream in) throws Exception{	//txt파일에서 데이터를 읽어오는 메소드
+		//object output stream으로 바꾸세요
 		try {
 			totalSales = in.readInt();	//누적 총 매출값 읽어와 저장
 			count = in.readInt();	//다음 상품 번호 값을 가지고 있는 count 읽어와 저장
 			int num = in.readInt();	//배열에 저장된 객체의 개수 값을 가지고 있는 num 읽어와 저장
-			
 			for(int i=0; i<num; i++) {	//for문을 돌면서 객체가 가지고 있는 데이터 읽어와 저장	
 				Goods goods = new Goods();	//goodsList에 새로운 객체를 만들어 할당
 				goods.read(in);
 				goodsList.add(goods);
 			}
 		}catch(Exception e) {	//입력이 제대로 이루어지지 않은 경우 익셉션 던지기
-			throw new Exception("입력 오류");
+			throw new Exception("데이터 읽기 실패");
+		}finally{
+			try {
+			in.close();
+			}catch(IOException e) {
+				
+			}
 		}
 	}
 }

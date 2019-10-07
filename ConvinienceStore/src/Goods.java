@@ -72,7 +72,7 @@ public class Goods {
 		}
 	}
 
-	void save(DataOutputStream out) throws Exception {
+	void save(ObjectOutputStream out) throws Exception {
 		//객체의 데이터필드의 값을 파일로 출력
 		//출력이 제대로 이루어지지 않으면 익셉션
 		out.writeUTF(category);
@@ -83,13 +83,27 @@ public class Goods {
 
 	}
 	
-	void read(DataInputStream in) throws Exception {
+	void read(ObjectInputStream in) throws Exception {
 		//객체의 데이터필드에 값을 저장
 		//읽어오는게 제대로 안되면 익셉션
-		category = in.readUTF();
-		name = in.readUTF();
-		price = in.readInt();
-		itemNumber = in.readInt();
-		stock = in.readInt();
+		try {
+			category = in.readUTF();
+		}catch(Exception e) {
+			System.out.println("카테고리 못읽음");
+		}
+		try {
+			name = in.readUTF();
+		}catch(Exception e) {
+			System.out.println("이름 못읽음");
+		}
+		try {
+			price = in.readInt();
+			itemNumber = in.readInt();
+			stock = in.readInt();
+		}catch(Exception e) {
+			System.out.println("숫자 못읽음");
+		}
 	}
+	
+
 }

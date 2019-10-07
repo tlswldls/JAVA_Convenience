@@ -4,23 +4,30 @@ import java.util.*;
 public class UserInterface {
 	public static void main(String []args) {
 		Management manager = null;
+		ObjectInputStream in=null;
 		try {
+			/*
 			//fIn에 information.txt파일 저장
 			FileInputStream fIn = new FileInputStream("information.txt");
 			//in에 fIn저장
 			DataInputStream in = new DataInputStream(fIn);
+			*/
 			//manager에 in을 읽어온 새로운 객체 할당
+			in = new ObjectInputStream(new FileInputStream("information.dat"));
 			manager = new Management(in);
 
 		}
 		catch(FileNotFoundException e) {	//파일이 존재하지 않는 경우
 			System.out.println("존재하지 않는 파일입니다.");
+			manager = new Management();
 		}
 		catch(IOException e) {	//읽어올 수 없는 파일인 경우
 			System.out.println("파일로 출력할 수 없습니다.");
+			manager = new Management();
 		}
 		catch(Exception e) {	//읽어오는 과정에서 문제가 발생한 경우
 			System.out.println("읽어오기에 실패했습니다.");
+			manager = new Management();
 		}
 		
 		System.out.println(
@@ -176,7 +183,13 @@ public class UserInterface {
 						break;	//while문 반복 종료
 					}
 					//입력받은 값으로 상품 객체 goods를 선언한다.
-					Goods goods = new Goods(category, name, price, manager.getcount(), stock);
+					//Goods goods = new Goods(category, name, price, manager.getcount(), stock);
+					Goods goods = new Goods();
+					goods.setcategory(category);
+					goods.setname(name);
+					goods.setprice(price);
+					goods.setitemNumber(manager.getcount());
+					goods.setstock(stock);
 					
 					manager.insertGoods(goods);	//goods를 goodsList에 추가
 				}else if(answer == 2) {//2. 상품 목록 조회.
@@ -247,18 +260,21 @@ public class UserInterface {
 						break;	//반복문 종료
 					}
 				}else if(answer==4) {	//저장
+					ObjectOutputStream out = null;
 					try {
+						/*
 						//fOut에 information.txt파일 저장
 						FileOutputStream fOut = new FileOutputStream("information.txt");
 						//out에 fOut저장
 						DataOutputStream out = new DataOutputStream(fOut);
-						
+						*/
+						out = new ObjectOutputStream(new FileOutputStream("information.dat"));
 						//out에 객체의 프로그램 실행 내용을 저장
 						manager.saveFile(out);
 						out.close();
 					}
-					catch(IOException e) {	//파일로 출력이 제대로 이루어지지 않는 경우
-						System.out.println("파일로 출력할 수 없습니다.");
+					catch(IOException e) {
+						System.out.print("출력중 에러가 발생했습니다.");
 					}
 					catch(Exception e) {	//출력을 하는 과정에서 에러가 발생한 경우
 						System.out.println("저장에 실패했습니다.");
