@@ -1,6 +1,6 @@
 import java.io.*;
 
-public class Goods {
+public class Goods implements java.io.Serializable {
 	private String category;	//대분류 이름
 	private String name;	//제품명
 	private int price;	//가격
@@ -71,7 +71,7 @@ public class Goods {
 			stock = stock - count;
 		}
 	}
-
+/*
 	void save(ObjectOutputStream out) throws Exception {
 		//객체의 데이터필드의 값을 파일로 출력
 		//출력이 제대로 이루어지지 않으면 익셉션
@@ -89,21 +89,20 @@ public class Goods {
 		try {
 			category = in.readUTF();
 		}catch(Exception e) {
-			System.out.println("카테고리 못읽음");
+			throw new Exception("카테고리 못읽음");
 		}
 		try {
 			name = in.readUTF();
 		}catch(Exception e) {
-			System.out.println("이름 못읽음");
+			throw new Exception("이름 못읽음");
 		}
 		try {
 			price = in.readInt();
 			itemNumber = in.readInt();
 			stock = in.readInt();
 		}catch(Exception e) {
-			System.out.println("숫자 못읽음");
+			throw new Exception("숫자 못읽음");
 		}
 	}
-	
-
+*/
 }

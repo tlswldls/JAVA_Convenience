@@ -4,16 +4,10 @@ import java.util.*;
 public class UserInterface {
 	public static void main(String []args) {
 		Management manager = null;
-		ObjectInputStream in=null;
+		FileInputStream in=null;
 		try {
-			/*
-			//fIn에 information.txt파일 저장
-			FileInputStream fIn = new FileInputStream("information.txt");
-			//in에 fIn저장
-			DataInputStream in = new DataInputStream(fIn);
-			*/
 			//manager에 in을 읽어온 새로운 객체 할당
-			in = new ObjectInputStream(new FileInputStream("information.dat"));
+			in = new FileInputStream("information.txt");
 			manager = new Management(in);
 
 		}
@@ -22,11 +16,10 @@ public class UserInterface {
 			manager = new Management();
 		}
 		catch(IOException e) {	//읽어올 수 없는 파일인 경우
-			System.out.println("파일로 출력할 수 없습니다.");
+			System.out.println("읽어올 수 없는 파일입니다.");
 			manager = new Management();
-		}
-		catch(Exception e) {	//읽어오는 과정에서 문제가 발생한 경우
-			System.out.println("읽어오기에 실패했습니다.");
+		} catch (Exception e) {
+			System.out.println("파일읽기에 실패했습니다.");
 			manager = new Management();
 		}
 		
@@ -44,28 +37,42 @@ public class UserInterface {
 			
 			try {
 				answer = input.nextInt();	//사용자가 입력한 숫자를 answer에 할당
+				input.nextLine();	//키보드 버퍼를 비우기 위한 nextLine()
 			}
-			catch(java.util.InputMismatchException e){	//사용자가 정수가 아닌 다른 값을 입력한 경우
+			catch(InputMismatchException e){	//사용자가 정수가 아닌 다른 값을 입력한 경우
 				System.out.print("숫자만 입력하세요.");	//숫자만 입력하라는 안내 문구 출력
-				answer = 0;	//사용자가 입력한 값을 answer에 저장할 수 없으므로 answer을 0으로 초기화
+				input.nextLine();	//키보드 버퍼를 비우기 위한 nextLine()
+				continue;	//while문의 처음으로 돌아가 다시 실행
 			}
-			
-			input.nextLine();	//키보드 버퍼를 비우기 위한 nextLine()
-			
 			if(answer == 1) {//1. 사용자
 				while(true) {
 					//사용자 메뉴 선택지 출력
 					StartMenu.clientMenu();
 					try {
 						answer = input.nextInt();
-						input.nextLine();
-					}catch(java.util.InputMismatchException e) {	//숫자가 아닌 값을 입력한 경우
+						input.nextLine();	//키보드 버퍼를 비우기 위한 nextLine()
+					}catch(InputMismatchException e) {	//숫자가 아닌 값을 입력한 경우
 						System.out.print("숫자만 입력하세요.");
+						input.nextLine();	//키보드 버퍼를 비우기 위한 nextLine()
+						continue;	//while문의 처음으로 돌아가 다시 실행
 					}
+					
+					
 					if(answer==1) {	//상품 구매를 선택한 경우
 						System.out.print("구매하고자 하는 물품의 이름을 입력하세요.: ");
-						answerStr = input.next();
-						input.nextLine();
+						
+						while(true) {
+							try {
+								answerStr = input.next();
+								input.nextLine();
+							}catch(Exception e) {
+								System.out.println("입력에 실패했습니다. 다시 시도해 주세요.");
+								continue;
+							}
+							break;
+						}
+						
+						
 						if(manager.findGoodsIndex(answerStr)==-1) {	//입력받은 상품의 이름과 같은 값을 가진 객체가 없는 경우
 							System.out.print("존재하지 않는 상품입니다.");
 							continue;	//다음 반복 실행
@@ -75,18 +82,21 @@ public class UserInterface {
 							try {
 								answer = input.nextInt();
 								input.nextLine();
-							}catch(java.util.InputMismatchException e) {	//숫자가 아닌 값을 입력한 경우
-								System.out.print("숫자만 입력하세요.");	//숫자만 입력하라는 안내 문구 출력
-								answer = 0;	//사용자가 입력한 값을 answer에 저장할 수 없으므로 answer을 0으로 초기화
-								continue;	//다음 반복 실행
+							}catch(InputMismatchException e) {	//숫자가 아닌 값을 입력한 경우
+								System.out.println("숫자만 입력하세요.");	//숫자만 입력하라는 안내 문구 출력
+								input.nextLine();	//키보드 버퍼를 비우기 위한 nextLine()
+								continue;
+							}catch(Exception e) {
+								System.out.println("입력에 실패했습니다. 다시 시도해 주세요.");
+								continue;
 							}
 							
 							if(answer<=0) {	//사용자가 입력한 값(구매하고자 하는 물건의 개수)이 0이하이면
 								System.out.println("1 이상의 숫자만 입력하세요.");
-								continue;	//다음 반복 실행
+								//continue;	//다음 반복 실행
 							}else if(answer>manager.getGoodsList()[manager.findGoodsIndex(answerStr)].getstock()) {	//사용자가 입력한 값(구매하고자 하는 물건의 개수)이 해당 물품의 재고보다 크다면
 								System.out.println("재고가 모자랍니다." +manager.getGoodsList()[manager.findGoodsIndex(answerStr)].getstock()+"이하의 숫자를 입력해주세요.");
-								continue;	//다음 반복 실행
+								//continue;	//다음 반복 실행
 							}
 							break;	//제대로 입력된 경우 반복 종료
 						}
@@ -95,10 +105,21 @@ public class UserInterface {
 							try {	//재고와 인덱스 값이 제대로 입력되어 총 금액이 제대로 반환되는 경우
 								System.out.print(manager.sellEstimate(manager.findGoodsIndex(answerStr), answer)+"원입니다. 구매하시겠습니까? (y/n)");	//구매할지 물어보기
 							}catch(Exception e) {	//제대로 입력되지 않아 익셉션이 발생한 경우
-								System.out.print("잘못된 값이 입력되었습니다. 다시 시도해주세요.");
+								System.out.println("잘못된 값이 입력되었습니다. 다시 시도해주세요.");
 								break;	//반복 종료
 							}
-							answerChar = input.next().charAt(0);
+							
+							while(true) {
+								try {
+									answerChar = input.next().charAt(0);
+									input.nextLine();
+								}catch(Exception e) {
+									System.out.println("입력에 실패했습니다. 다시 시도해 주세요.");
+									continue;
+								}
+								break;
+							}
+							
 							if(answerChar=='y') {	//사용자가 구매하겠다고 한 경우
 								try {
 									if(manager.sellEstimate(manager.findGoodsIndex(answerStr), answer)!=-1) {	//총 금액이 제대로 반환되면
@@ -106,7 +127,7 @@ public class UserInterface {
 										System.out.println("구매가 완료되었습니다.");	//구매가 완료되었습니다 출력
 										break;	//반복 종료
 									}else {	//제대로 반환되지 않은 경우
-									System.out.print("잘못된 값이 입력되었습니다. 다시 시도해주세요.");
+									System.out.println("잘못된 값이 입력되었습니다. 다시 시도해주세요.");
 									break;
 									}
 								}catch(Exception e) {
@@ -130,12 +151,17 @@ public class UserInterface {
 				StartMenu.managementMenu();
 				try {
 					answer = input.nextInt();	//사용자가 입력한 숫자를 answer에 할당
+					input. nextLine();
 				}
-				catch(java.util.InputMismatchException e){	//사용자가 정수가 아닌 다른 값을 입력한 경우
+				catch(InputMismatchException e){	//사용자가 정수가 아닌 다른 값을 입력한 경우
 					System.out.print("숫자만 입력하세요.");	//숫자만 입력하라는 안내 문구 출력
-					answer = 0;	//사용자가 입력한 값을 answer에 저장할 수 없으므로 answer을 0으로 초기화
+					input.nextLine();	//키보드 버퍼를 비우기 위한 nextLine()
+					continue;	//while문의 처음으로 돌아가 다시 실행
+					//answer = 0;	//사용자가 입력한 값을 answer에 저장할 수 없으므로 answer을 0으로 초기화
+				}catch(Exception e) {
+					System.out.println("입력에 실패했습니다. 다시 시도해 주세요.");
+					continue;
 				}
-				input. nextLine();
 				
 				if(answer == 1) {//상품 추가
 					//사용자에게 입력받은 goods에 대한 데이터를 저장 할 변수 선언
@@ -145,13 +171,29 @@ public class UserInterface {
 					int stock;
 					
 					//사용자가 값을 입력하도록 안내 문구를 출력하고 입력받은 값으로 각각의 변수를 초기화 한다
-					System.out.print("상품의 카테고리를 입력하세요.: ");
-					category = input.next();
-					input. nextLine();
-
-					System.out.print("상품의 이름을 입력하세요.: ");
-					name = input.next();
-					input. nextLine();
+					while(true) {
+						System.out.print("상품의 카테고리를 입력하세요.: ");
+						try {
+							category = input.next();
+							input. nextLine();
+						}catch(Exception e) {
+							System.out.println("입력에 실패했습니다. 다시 시도해 주세요.");
+							continue;
+						}
+						break;
+					}
+					
+					while(true) {
+						System.out.print("상품의 이름을 입력하세요.: ");
+						try {
+							name = input.next();
+							input. nextLine();
+						}catch(Exception e) {
+							System.out.println("입력에 실패했습니다. 다시 시도해 주세요.");
+							continue;
+						}
+						break;
+					}
 					
 					while(true) {
 						System.out.print("상품의 가격을 입력하세요.(숫자만 입력하세요.): ");
@@ -159,11 +201,13 @@ public class UserInterface {
 						try {
 							price = input.nextInt();
 							input. nextLine();
-						}
-						catch(java.util.InputMismatchException e){	//사용자가 정수가 아닌 다른 값을 입력한 경우
+						}catch(InputMismatchException e){	//사용자가 정수가 아닌 다른 값을 입력한 경우
 							System.out.print("숫자만 입력하세요.");	//숫자만 입력하라는 안내 문구 출력
-							input = new Scanner(System.in);	//input변수 다시 선언
+							input.nextLine();	//키보드 버퍼를 비우기 위한 nextLine()
 							continue;	//while문의 처음으로 돌아가 다시 실행
+						}catch(Exception e) {
+							System.out.println("입력에 실패했습니다. 다시 시도해 주세요.");
+							continue;
 						}
 						break;	//while문 반복 종료
 					}
@@ -174,22 +218,18 @@ public class UserInterface {
 						try {
 							stock = input.nextInt();
 							input. nextLine();
-						}
-						catch(java.util.InputMismatchException e){	//사용자가 정수가 아닌 다른 값을 입력한 경우
+						}catch(InputMismatchException e){	//사용자가 정수가 아닌 다른 값을 입력한 경우
 							System.out.print("숫자만 입력하세요.");	//숫자만 입력하라는 안내 문구 출력
-							input = new Scanner(System.in);	//input변수 다시 선언
+							input.nextLine();	//키보드 버퍼를 비우기 위한 nextLine()
 							continue;	//while문의 처음으로 돌아가 다시 실행
+						}catch(Exception e) {
+							System.out.println("입력에 실패했습니다. 다시 시도해 주세요.");
+							continue;
 						}
 						break;	//while문 반복 종료
 					}
 					//입력받은 값으로 상품 객체 goods를 선언한다.
-					//Goods goods = new Goods(category, name, price, manager.getcount(), stock);
-					Goods goods = new Goods();
-					goods.setcategory(category);
-					goods.setname(name);
-					goods.setprice(price);
-					goods.setitemNumber(manager.getcount());
-					goods.setstock(stock);
+					Goods goods = new Goods(category, name, price, manager.getcount(), stock);
 					
 					manager.insertGoods(goods);	//goods를 goodsList에 추가
 				}else if(answer == 2) {//2. 상품 목록 조회.
@@ -198,7 +238,9 @@ public class UserInterface {
 					try {
 						goodsList = manager.getGoodsList();	//매니저 객체에서 가져온 배열을 goodsList에 저장한다
 					}catch(NullPointerException e) {	//매니저 객체가 가지고 있는 배열이 비어있으면
-						System.out.print("상품 목록이 비어있습니다.");	//안내 메시지 출력
+						System.out.println("상품 목록이 비어있습니다.");	//안내 메시지 출력
+					}catch(Exception e) {
+						System.out.println("상품목록 조회에 실패했습니다. 다시 시도해 주세요.");
 					}
 					if(goodsList!=null) {
 						for(int i=0; i<manager.getNum(); i++){	//배열이 비어있지 않으면 해당 물품의 데이터를 출력
@@ -212,10 +254,19 @@ public class UserInterface {
 					}
 				}else if(answer == 3) {//3. 상품 삭제. 
 					while(true) {
-						//상품의 카테고리를 입력받아 그 카테고리에 속하는 물품을 출력함
-						System.out.print("삭제하고자 하는 상품의 카테고리를 입력하세요. : ");
-						answerStr = input.next();
-						input.nextLine();
+						while(true) {
+							//상품의 카테고리를 입력받아 그 카테고리에 속하는 물품을 출력함
+							System.out.print("삭제하고자 하는 상품의 카테고리를 입력하세요. : ");
+							try {
+								answerStr = input.next();
+								input.nextLine();
+							}catch(Exception e) {
+								System.out.println("입력에 실패했습니다. 다시 시도해 주세요.");
+								continue;
+							}
+							break;
+						}
+						
 						try{
 							categoryItems = manager.findGoods(answerStr);
 						}catch(Exception e){	//입력받은 이름과 일치하는 카테고리를 갖는 상품이 없는 경우
@@ -237,8 +288,13 @@ public class UserInterface {
 							try {
 								answer = input.nextInt();
 								input. nextLine();
+							}catch(InputMismatchException e) {
+								System.out.println("숫자만 입력하세요");
+								input.nextLine();	//키보드 버퍼를 비우기 위한 nextLine()
+								continue;
 							}catch(Exception e) {
-								System.out.print("숫자만 입력하세요");
+								System.out.println("입력에 실패했습니다. 다시 시도해 주세요.");
+								continue;
 							}
 							if(answer>categoryItems.length || answer<=0) {	//입력받은 값이 물품 번호의 범위를 벗어나는 경우
 								System.out.print("다시 입력하세요.");
@@ -260,18 +316,12 @@ public class UserInterface {
 						break;	//반복문 종료
 					}
 				}else if(answer==4) {	//저장
-					ObjectOutputStream out = null;
+					FileOutputStream out = null;
 					try {
-						/*
 						//fOut에 information.txt파일 저장
-						FileOutputStream fOut = new FileOutputStream("information.txt");
-						//out에 fOut저장
-						DataOutputStream out = new DataOutputStream(fOut);
-						*/
-						out = new ObjectOutputStream(new FileOutputStream("information.dat"));
+						out = new FileOutputStream("information.txt");
 						//out에 객체의 프로그램 실행 내용을 저장
 						manager.saveFile(out);
-						out.close();
 					}
 					catch(IOException e) {
 						System.out.print("출력중 에러가 발생했습니다.");
@@ -292,6 +342,5 @@ public class UserInterface {
 				System.out.println("다시 입력하세요.");
 			}
 		}
-
 	}
 }

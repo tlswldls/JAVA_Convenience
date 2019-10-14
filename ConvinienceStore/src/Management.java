@@ -2,16 +2,17 @@ import java.io.*;
 import java.util.*;
 public class Management {
 	private LinkedList<Goods> goodsList = new LinkedList<Goods>();	//물품 객체를 저장하는 LinkedList goodsList
-	private int count = 1;	//insertGoods함수가 호출된 횟수를 나타내는 데이터필드. 객체의 상품번호를 나타낸다
+	private int itemNumber = 0;	//insertGoods함수가 호출된 횟수를 나타내는 데이터필드. 객체의 상품번호를 나타낸다
 	private int totalSales = 0;
 	
 	
-	Management(ObjectInputStream in)throws Exception{
+	Management(FileInputStream in)throws Exception{
 			//저장된 파일이 있다면 자동으로 읽어오는 생성자
 		try {
 			readFile(in);
 			in.close();
 		}catch(Exception e) {//익셉션이 발생한 경우
+			e.printStackTrace();
 			throw new Exception("읽어오기 에러");
 		}
 	}
@@ -34,11 +35,11 @@ public class Management {
 
 	void insertGoods(Goods item) {//goodsList에 새로운 물건을 추가하는 메소드
 		goodsList.add(item);//goodList에 item을 할당하고
-		count++;	//count에 1을 더한다.
+		itemNumber++;	//count에 1을 더한다.
 	}
 	
 	int getcount() {	//insertGoods함수가 실행된 횟수를 반환해주는 메소드
-		return count;
+		return itemNumber;
 	}
 	
 	int getNum() {	//LinkedList에 저장된 객체의 개수를 반환해주는 메소드
@@ -52,7 +53,7 @@ public class Management {
 	int findGoodsIndex(String name) {	//상품 이름을 파라메터로 해서 그 객체가 있는 배열의 index를 반환하는 메소드
 		Iterator<Goods> iterator = goodsList.iterator();
 		
-		int i=0;
+		int i=0; //반환할 인덱스 값을 나타내는 i
 		while(iterator.hasNext()) {
 			if(iterator.next().getname().equals(name)) {	//i를 인덱스로 갖는 객체의 이름과 파라미터로 들어온 이름이 같다면
 				return i;	//그 객체의 인덱스 값을 리턴
@@ -70,7 +71,6 @@ public class Management {
 		}catch(Exception e) {
 			throw new Exception("물품 없음");
 		}
-		
 	}
 	
 	Goods[] findGoods(String category) throws Exception {//카테고리 이름을 입력받고 그 카테고리에 해당하는 객체 배열을 반환하는 메소드
@@ -122,43 +122,48 @@ public class Management {
 		}
 	}
 	
-	void saveFile(ObjectOutputStream out) throws Exception{	//데이터를 txt파일로 출력하는 메소드
-		//object output stream으로 바꾸세요
+	void saveFile(FileOutputStream out) throws Exception{	//데이터를 txt파일로 출력하는 메소드
+		ObjectOutputStream outObject = new ObjectOutputStream(out);
 		try{
 			Iterator<Goods> iterator = goodsList.iterator();
-			out.writeInt(totalSales);	//누적 총 매출값 출력
-			out.writeInt(count);	//다음 상품 번호 값을 가지고 있는 count 값 출력
-			out.writeInt(goodsList.size());	//배열에 저장된 객체의 개수 값을 가지고 있는 num 출력
+			outObject.writeInt(new Integer(totalSales));	//누적 총 매출값 출력
+			outObject.writeInt(new Integer(itemNumber));	//다음 상품 번호 값을 가지고 있는 count 값 출력
+			outObject.writeInt(new Integer(goodsList.size()));	//배열에 저장된 객체의 개수 값을 가지고 있는 num 출력
 		      
 			while(iterator.hasNext()) {	//객체가 가지고 있는 데이터 출력
-				iterator.next().save(out);
+				outObject.writeObject(iterator.next());
 			}
 		}catch(IOException e) {	//출력이 제대로 이루어지지 않은 경우 익셉션 던지기
 			throw new Exception("출력 오류");
 		}finally {
 			try {
 				out.close();
+				outObject.close();
 			}catch(Exception e) {
 			}
 		}
 	}
 
-	void readFile(ObjectInputStream in) throws Exception{	//txt파일에서 데이터를 읽어오는 메소드
-		//object output stream으로 바꾸세요
+	void readFile(FileInputStream in) throws Exception{	//txt파일에서 데이터를 읽어오는 메소드
+		ObjectInputStream inObject = new ObjectInputStream(in);
+		
 		try {
-			totalSales = in.readInt();	//누적 총 매출값 읽어와 저장
-			count = in.readInt();	//다음 상품 번호 값을 가지고 있는 count 읽어와 저장
-			int num = in.readInt();	//배열에 저장된 객체의 개수 값을 가지고 있는 num 읽어와 저장
+			totalSales = inObject.readInt();	//누적 총 매출값 읽어와 저장
+			itemNumber = inObject.readInt();	//다음 상품 번호 값을 가지고 있는 count 읽어와 저장
+			int num = inObject.readInt();	//배열에 저장된 객체의 개수 값을 가지고 있는 num 읽어와 저장
+			
 			for(int i=0; i<num; i++) {	//for문을 돌면서 객체가 가지고 있는 데이터 읽어와 저장	
 				Goods goods = new Goods();	//goodsList에 새로운 객체를 만들어 할당
-				goods.read(in);
+				goods = (Goods) inObject.readObject();
 				goodsList.add(goods);
 			}
 		}catch(Exception e) {	//입력이 제대로 이루어지지 않은 경우 익셉션 던지기
+			e.printStackTrace();
 			throw new Exception("데이터 읽기 실패");
 		}finally{
 			try {
 			in.close();
+			inObject.close();
 			}catch(IOException e) {
 				
 			}
