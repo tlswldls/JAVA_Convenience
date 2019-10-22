@@ -1,5 +1,8 @@
 import java.io.*;
 import java.util.*;
+import java.awt.*;
+import javax.swing.*;
+import java.awt.event.*;
 
 public class UserInterface {
 	public static void main(String []args) {
@@ -9,7 +12,6 @@ public class UserInterface {
 			//manager에 in을 읽어온 새로운 객체 할당
 			in = new FileInputStream("information.txt");
 			manager = new Management(in);
-
 		}
 		catch(FileNotFoundException e) {	//파일이 존재하지 않는 경우
 			System.out.println("존재하지 않는 파일입니다.");
@@ -22,6 +24,8 @@ public class UserInterface {
 			System.out.println("파일읽기에 실패했습니다.");
 			manager = new Management();
 		}
+		//JFrame mainframe = new JFrame("*편의점 프로그램*");
+		
 		
 		System.out.println(
 				"---------------*편의점 프로그램*---------------"
