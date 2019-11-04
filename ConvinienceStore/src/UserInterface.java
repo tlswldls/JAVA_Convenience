@@ -61,7 +61,6 @@ public class UserInterface {
 						continue;	//while문의 처음으로 돌아가 다시 실행
 					}
 					
-					
 					if(answer==1) {	//상품 구매를 선택한 경우
 						System.out.print("구매하고자 하는 물품의 이름을 입력하세요.: ");
 						

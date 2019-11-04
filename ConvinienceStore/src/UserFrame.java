@@ -19,12 +19,12 @@ import javax.swing.JTextField;
 
 import java.io.*;
 
-class UserPanel extends JPanel{
+class UserPanel extends JPanel{	//메인 페이지에서 사용자 모드를 선택하면 접근 가능한 유저 패널
 	private UserFrame frame;		
-	JTextPane textPane = new JTextPane();
-	JTextPane textPane_1 = new JTextPane();
-	JButton button = new JButton("상품 구매");
-	JButton button_1 = new JButton("뒤로 가기");
+	JTextPane textPane = new JTextPane();	//현재 모드를 알려주는 텍스트팬
+	JTextPane textPane_1 = new JTextPane();	//안내 문구를 출력하는 텍스트팬2
+	JButton toBuyPanelButton = new JButton("상품 구매");	//상품구매를 진행할 수 있는 패널로 이동하는 버튼
+	JButton button_1 = new JButton("뒤로 가기");	//메인페이지로 되돌아갈 수 있는 뒤로 가기 버튼
 
 	public UserPanel(UserFrame frame) {
 		this.frame = frame;
@@ -42,11 +42,11 @@ class UserPanel extends JPanel{
 		textPane_1.setBounds(108, 65, 225, 29);
 		add(textPane_1);
 		
-		button.setBounds(139, 119, 166, 23);
-		add(button);
-		button.addActionListener(new ActionListener() {
+		toBuyPanelButton.setBounds(139, 119, 166, 23);
+		add(toBuyPanelButton);
+		toBuyPanelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(e.getSource()==button) {
+				if(e.getSource()==toBuyPanelButton) {
 					frame.change("buyPanel");
 				}
 			}
@@ -66,23 +66,27 @@ class UserPanel extends JPanel{
 
 class BuyPanel extends JPanel{
 	private UserFrame frame;			
-	FileInputStream in = null;
-	Management manager = null;
+	//테이블을 출력하기 위한 데이터들
 	String columnNames[] = {"상품 번호","카테고리", "이름", "가격", "재고"};
 	DefaultTableModel dtm = new DefaultTableModel(columnNames,0);
 	JTable table = new JTable(dtm);
+	JScrollPane scrollPane = new JScrollPane();
+	//안내 문구를 출력하기 위한 textPane
 	JTextPane userModeText = new JTextPane();
 	JTextPane buyGoodsText = new JTextPane();
 	JTextPane noticeText = new JTextPane();
+	//구매 물품 총 가격 확인, 상품 구매, 취소 등의 액션을 진행할 수 있는 버튼들
 	JButton buttonYes = new JButton("네");
 	JButton buttonNo = new JButton("아니오");
 	JButton buttonBack = new JButton("뒤로가기");
 	JButton buttonCheck = new JButton("확인");
-	JScrollPane scrollPane = new JScrollPane();
+	//사용자가 입력한 값을 읽어오기 위한 텍스트 필드
 	JTextField text = new JTextField();		
 	JTextField text_1 = new JTextField();
+	//사용자가 입력해야 하는 값에 대한 안내를 출력하는 라벨
 	JLabel lblNewLabel = new JLabel("상품 번호: ");
 	JLabel cntlabel = new JLabel("개수: ");
+	//손님이 지불해야 하는 총 금액을 나타내는 totalPrice
 	int totalPrice = 0;
 	
 
@@ -90,19 +94,7 @@ class BuyPanel extends JPanel{
 		this.frame = frame;
 		setLayout(null);
 		
-		try {
-			in = new FileInputStream("information.txt");
-		} catch (Exception e) {
-			System.out.print("파일 읽기에 실패했습니다.");
-		}
-		
-		try {
-			manager = new Management(in);
-		} catch (Exception e1) {
-			System.out.println("파일읽기에 실패했습니다.");
-			manager = new Management();
-		}
-
+		Management manager = MainFrame.returnManager();
 		for(int i = 0; i<manager.getNum(); i++) {
 			String category = manager.getGoodsList()[i].getcategory();
 			String name = manager.getGoodsList()[i].getname();
@@ -207,10 +199,7 @@ class BuyPanel extends JPanel{
 	
 }
 
-public class UserFrame extends JFrame {
-	
-	Management manager = null;
-	
+public class UserFrame extends JFrame {	
 	public UserFrame() {
 	}
 
