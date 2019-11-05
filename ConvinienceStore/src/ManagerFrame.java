@@ -62,22 +62,11 @@ public class ManagerFrame extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		//기존의 데이터 읽어와서 테이블에 출력하기
-		/*
-		try {
-			in = new FileInputStream("information.txt");
-		} catch (Exception e1) {
-			System.out.print("파일 읽기에 실패했습니다.");
-		}
-		
-		try {
-			manager = 
-		} catch (Exception e1) {
-			System.out.println("파일읽기에 실패했습니다.");
-			manager = new Management();
-		}
-		*/
 
+		JPanel addPanel = new JPanel();
+		JPanel deletePanel = new JPanel();
+		
+		//기존의 데이터 읽어와서 테이블에 출력하기
 		for(int i = 0; i<manager.getGoodsList().length; i++) {
 			String category = manager.getGoodsList()[i].getcategory();
 			String name = manager.getGoodsList()[i].getname();
@@ -114,7 +103,9 @@ public class ManagerFrame extends JFrame {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//버튼이 눌리면 새로운 패널을 만들어 추가하고 새로운 상품을 추가하기 위한 텍스트필드와 버튼 텍스트팬이 생긴다
-				JPanel addPanel = new JPanel();
+				deletePanel.setVisible(false);
+				addPanel.setVisible(true);
+				
 				addPanel.setBounds(0, 266, 435, 164);
 				contentPane.add(addPanel);
 				addPanel.setLayout(null);
@@ -168,21 +159,80 @@ public class ManagerFrame extends JFrame {
 				addPanel.add(addButton);
 				addButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						String name = goodsNameInput.getText();
-						String category = goodsCategoryInput.getText();
-						int price = Integer.parseInt(goodsPriceInput.getText());
-						int stock = Integer.parseInt(goodsStockInput.getText());
+						Dialog caution;
+						JFrame frame = new JFrame();
 						
-						manager.insertGoods(new Goods(category, name, price, manager.getcount(), stock));
-						Object [] newrow = {manager.getcount(), category, name, (int)price, (int)stock};
-						dtm.addRow(newrow);
-						goodsNameInput.setText("");
-						goodsCategoryInput.setText("");
-						goodsPriceInput.setText("");
-						goodsStockInput.setText("");
+						String name = null, category=null;
+						int price=0, stock=0;
 						
-						//추가가 완료되면 사용한 패널을 다시 숨긴다.
-						addPanel.setVisible(false);
+						//각각의 데이터를 입력받고, 입력에 실패한 경우 팝업을 띄우고 추가 메뉴를 종료시킨다.
+						try {
+							name = goodsNameInput.getText();
+						}catch(Exception e1) {
+							caution = new Dialog(frame, "주의", "상품 저장에 실패했습니다. 이름을 확인해 주세요.");
+							System.out.print("이름 이상");
+							goodsNameInput.setText("");
+							goodsCategoryInput.setText("");
+							goodsPriceInput.setText("");
+							goodsStockInput.setText("");
+							
+							caution.setVisible(true);
+							return;
+						}
+						try {
+							category = goodsCategoryInput.getText();
+						}catch(Exception e1) {
+							caution = new Dialog(frame, "주의", "상품 저장에 실패했습니다. 카테고리를 확인해 주세요.");
+							System.out.print("카테고리 이상");
+							goodsNameInput.setText("");
+							goodsCategoryInput.setText("");
+							goodsPriceInput.setText("");
+							goodsStockInput.setText("");
+							
+							caution.setVisible(true);
+							return;
+						}
+						try {
+							price = Integer.parseInt(goodsPriceInput.getText());
+						}catch(Exception e1) {
+							caution = new Dialog(frame, "주의", "상품 저장에 실패했습니다. 가격을 확인해 주세요.");
+							System.out.print("가격 이상");
+							goodsNameInput.setText("");
+							goodsCategoryInput.setText("");
+							goodsPriceInput.setText("");
+							goodsStockInput.setText("");
+							
+							caution.setVisible(true);
+							return;
+						}
+						try {
+							stock = Integer.parseInt(goodsStockInput.getText());
+						}catch(Exception e1) {
+							caution = new Dialog(frame, "주의", "상품 저장에 실패했습니다. 재고를 확인해 주세요.");
+							System.out.print("재고 이상");
+							goodsNameInput.setText("");
+							goodsCategoryInput.setText("");
+							goodsPriceInput.setText("");
+							goodsStockInput.setText("");
+							
+							caution.setVisible(true);
+							return;
+						}
+						
+						//가격이나 재고가 0 이하일 경우 상품을 추가하지 않는다.
+						if(price>0&&stock>0) {
+							manager.insertGoods(new Goods(category, name, price, manager.getcount(), stock));
+							Object [] newrow = {manager.getcount(), category, name, (int)price, (int)stock};
+							dtm.addRow(newrow);
+							goodsNameInput.setText("");
+							goodsCategoryInput.setText("");
+							goodsPriceInput.setText("");
+							goodsStockInput.setText("");
+						}else {
+							caution = new Dialog(frame, "주의", "상품 저장에 실패했습니다. 0이상의 숫자로 입력하세요.");
+							caution.setVisible(true);
+							return;
+						}
 					}
 				});
 
@@ -238,35 +288,47 @@ public class ManagerFrame extends JFrame {
 		button_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//버튼이 눌리면 해당 이벤트를 진행하기 위한 패널과 텍스트필드, 텍스트 팬, 버튼들이 생긴다.
-				JPanel panel = new JPanel();
-				panel.setBounds(12, 271, 411, 147);
-				contentPane.add(panel);
-				panel.setLayout(null);
+				addPanel.setVisible(false);
+				deletePanel.setVisible(true);
+				
+				deletePanel.setBounds(12, 271, 411, 147);
+				contentPane.add(deletePanel);
+				deletePanel.setLayout(null);
 				
 				JLabel deleteLabel = new JLabel("삭제하고자 하는 물품의 번호를 입력하세요.");
 				deleteLabel.setFont(new Font("나눔바른펜", Font.PLAIN, 20));
 				deleteLabel.setBounds(49, 10, 350, 27);
-				panel.add(deleteLabel);
+				deletePanel.add(deleteLabel);
 				
 				JTextPane textPane_2 = new JTextPane();
 				textPane_2.setText("상품 번호: ");
 				textPane_2.setFont(new Font("굴림", Font.PLAIN, 14));
 				textPane_2.setBackground(SystemColor.menu);
 				textPane_2.setBounds(12, 68, 85, 21);
-				panel.add(textPane_2);
+				deletePanel.add(textPane_2);
 				
 				JTextField textField = new JTextField();
 				textField.setColumns(10);
 				textField.setBounds(90, 68, 160, 21);
-				panel.add(textField);
+				deletePanel.add(textField);
 				
 				JButton deleteButton = new JButton("삭제");
 				deleteButton.setBounds(320, 56, 79, 23);
-				panel.add(deleteButton);
+				deletePanel.add(deleteButton);
 				deleteButton.addActionListener(new ActionListener() {//삭제 버튼이 눌리면
 					public void actionPerformed(ActionEvent e) {
+						Dialog caution;
+						JFrame frame = new JFrame();
+						caution = new Dialog(frame, "주의", "상품 삭제에 실패했습니다. 다시 시도해 주세요.");
 						//상품 번호로 입력받은 값을 아이템 넘버로 갖는 상품을 찾아 테이블과 goodsList에서 삭제한다.
-						int i = Integer.parseInt(textField.getText());
+						int i=-1;
+						try {						
+							i = Integer.parseInt(textField.getText());
+						}catch(Exception e1) {
+							caution.setVisible(true);
+							return;
+						}
+						
 						for(int j=0;j<manager.getGoodsList().length;j++) {
 							if(dtm.getValueAt(j, 0).equals(i)) {
 								try {
@@ -278,17 +340,17 @@ public class ManagerFrame extends JFrame {
 							}
 						}
 						//삭제 작업이 완료된 다음 패널을 숨긴다.
-						panel.setVisible(false);
+						deletePanel.setVisible(false);
 					}
 				});
 				
 				JButton deleteCancelButton = new JButton("취소");
 				deleteCancelButton.setBounds(320, 103, 79, 23);
-				panel.add(deleteCancelButton);
+				deletePanel.add(deleteCancelButton);
 				deleteCancelButton.addActionListener(new ActionListener() {//관리가자 삭제 작업을 취소하면
 					public void actionPerformed(ActionEvent e) {
 						//패널을 숨긴다
-						panel.setVisible(false);
+						deletePanel.setVisible(false);
 					}
 				});
 				
@@ -301,6 +363,12 @@ public class ManagerFrame extends JFrame {
 		contentPane.add(button_2);
 		button_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				JFrame dialogframe = new JFrame();
+				Dialog dialog1, dialog2;
+
+				dialog1 = new Dialog(dialogframe, "저장", "성공적으로 저장되었습니다. 이용해주셔서 감사합니다.");
+				dialog2 = new Dialog(dialogframe, "주의", "저장에 실패했습니다. 다시 시도해 주세요.");
+
 				//버튼이 눌리면 작업한 내용을 저장한다.
 				FileOutputStream out = null;
 				try {
@@ -311,11 +379,14 @@ public class ManagerFrame extends JFrame {
 				}
 				catch(IOException e1) {
 					System.out.print("출력중 에러가 발생했습니다.");
+					dialog2.setVisible(true);
 				}
 				catch(Exception e1) {	//출력을 하는 과정에서 에러가 발생한 경우
 					System.out.println("저장에 실패했습니다.");
+					dialog2.setVisible(true);
 				}
 
+				dialog1.setVisible(true);
 			}
 		});
 		

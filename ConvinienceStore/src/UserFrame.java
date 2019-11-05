@@ -1,6 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -10,6 +11,8 @@ import javax.swing.JTextPane;
 import java.awt.SystemColor;
 import java.awt.Font;
 import javax.swing.JButton;
+import javax.swing.JDialog;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JScrollPane;
@@ -137,10 +140,16 @@ class BuyPanel extends JPanel{
 		buttonNo.setBounds(297, 326, 97, 23);
 		buttonNo.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
+				JFrame dialogframe = new JFrame();
+				Dialog dialog;
+
+				dialog = new Dialog(dialogframe, "구매완료", "구매가 완료되었습니다. 이용해 주셔서 감사합니다.");
+
 				text.setText("");
 				text_1.setText("");
 				totalPrice = 0;
 				noticeText.setText("총	"+totalPrice+"원입니다. 구매하시겠습니까?");
+				dialog.setVisible(true);
 			}
 		});
 		add(buttonNo);
@@ -148,8 +157,29 @@ class BuyPanel extends JPanel{
 		buttonBack.setBounds(12, 10, 97, 23);		
 		buttonBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				Dialog caution;
+				JFrame cframe = new JFrame();
+				caution = new Dialog(frame,"주의", "저장에 실패했습니다. 다시 시도해 주세요.");
+				
 				if(e.getSource()==buttonBack) {
 					frame.change("userPanel");
+					//버튼이 눌리면 작업한 내용을 저장한다.
+					FileOutputStream out = null;
+					try {
+						//fOut에 information.txt파일 저장
+						out = new FileOutputStream("information.txt");
+						//out에 객체의 프로그램 실행 내용을 저장
+						manager.saveFile(out);
+					}
+					catch(IOException e1) {
+						System.out.print("출력중 에러가 발생했습니다.");
+						caution.setVisible(true);
+					}
+					catch(Exception e1) {	//출력을 하는 과정에서 에러가 발생한 경우
+						System.out.println("저장에 실패했습니다.");
+						caution.setVisible(true);
+					}
+
 				}
 			}
 		});
@@ -165,10 +195,43 @@ class BuyPanel extends JPanel{
 		add(buttonCheck);
 		buttonCheck.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-					int i = Integer.parseInt(text.getText());
-					int numWanted = Integer.parseInt(text_1.getText());
+				Dialog caution;
+				JFrame frame = new JFrame();
+				caution = new Dialog(frame,"주의", "다시 입력해 주세요.(숫자만 입력하세요)");
+				
+				int i, numWanted;
+				try {
+					i = Integer.parseInt(text.getText());
+				}catch(NumberFormatException e1) {
+					i=0;
+					caution.setVisible(true);
+					text.setText("");
+					text_1.setText("");
+				}
+				try {
+					numWanted = Integer.parseInt(text_1.getText());
+				}catch(NumberFormatException e1) {
+					numWanted = 0;
+					caution.setVisible(true);
+					text.setText("");
+					text_1.setText("");
+				}
+				
+				
+				try {				
+					if(i<0||i>manager.getNum()) {
+						caution.setVisible(true);
+						return;
+					}else if(numWanted<=0||numWanted>manager.getGoodsList()[i].getstock()) {
+						caution.setVisible(true);
+						return;
+					}				
 					totalPrice = (int)dtm.getValueAt(i, 3)*numWanted;					
-					
+				}catch(Exception e1) {
+					caution.setVisible(true);
+					return;
+				}
+	
 					noticeText.setText("총	"+totalPrice+"원입니다. 구매하시겠습니까?");
 			}
 		});

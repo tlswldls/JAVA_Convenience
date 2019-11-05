@@ -1,4 +1,5 @@
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -6,10 +7,32 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
 import java.awt.GridLayout;
 import javax.swing.JButton;
+import javax.swing.JDialog;
+
 import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.io.FileInputStream;
 import java.awt.event.ActionEvent;
+
+class Dialog extends JDialog{
+	JButton ok = new JButton("OK");
+	JLabel caution = new JLabel();
+	
+	public Dialog(JFrame frame, String title, String text) {
+		super(frame,title);
+		setLayout(new FlowLayout());
+		caution.setText(text);
+		add(caution);
+		add(ok);
+		setSize(300,100);
+		
+		ok.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+			}
+		});
+	}
+}
 
 public class MainFrame extends JFrame {
 
@@ -83,17 +106,24 @@ public class MainFrame extends JFrame {
 		panel.add(lblNewLabel);
 		
 		//기존의 데이터를 가져오기 위한 FileInputStream in과 매니저 객체
+		
 
 	}
 	
 	public static Management returnManager() {
 		Management manager = null;
 		FileInputStream in = null;
+		JFrame dialogframe = new JFrame();
+		Dialog dialog;
 
+		dialog = new Dialog(dialogframe, "주의", "데이터 불러오기에 실패했습니다. 새로운 데이터를 생성합니다.");
+		
 		try {
 			in = new FileInputStream("information.txt");
 		} catch (Exception e) {
 			System.out.print("파일 읽기에 실패했습니다.");
+			manager = new Management();
+			dialog.setVisible(true);
 		}
 		
 		try {
@@ -101,6 +131,7 @@ public class MainFrame extends JFrame {
 		} catch (Exception e1) {
 			System.out.println("파일읽기에 실패했습니다.");
 			manager = new Management();
+			dialog.setVisible(true);
 		}
 		
 		
